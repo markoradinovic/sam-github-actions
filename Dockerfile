@@ -1,4 +1,4 @@
-FROM amazonlinux:latest
+FROM python:3-alpine
 
 LABEL "com.github.actions.name"="AWS SAM Lambda Deployment"
 LABEL "com.github.actions.description"="Deploying Lambda via AWS SAM cli"
@@ -10,15 +10,13 @@ LABEL "homepage"="https://github.com/chriscoffee"
 LABEL "maintainer"="Chris Mills <millscj01@gmail.com>"
 LABEL "version"="0.0.1"
 
-RUN yum upgrade -y \
-	&& yum install -y \
-		unzip \
+RUN apk --no-cache --virtual add \
+		gcc \
+		musl-dev \
+	&& apk --no-cache add \
 		groff \
 		jq \
-		python3 \
-		python3-devel \
-		python3-pip \
-	&& pip3 install \
+	&& pip install \
 		awscli \
 		aws-sam-cli \
 	&& mkdir -p /root/.aws \
@@ -28,7 +26,8 @@ RUN yum upgrade -y \
 		echo 'region = $AWS_DEFAULT_REGION'; \
 		echo 'aws_access_key_id = $AMAZON_ACCESS_KEY_ID'; \
 		echo 'aws_secret_access_key = $AMAZON_SECRET_ACCESS_KEY'; \
-	} > /root/.aws/config
+	} > /root/.aws/config \
+	&& apk del gcc musl-dev
 
 COPY "entrypoint.sh" "/entrypoint.sh"
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
