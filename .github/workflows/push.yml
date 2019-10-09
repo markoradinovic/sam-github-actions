@@ -1,0 +1,27 @@
+on: push
+name: Build and Publish
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Build
+      uses: actions/action-builder/docker@master
+      with:
+        entrypoint: make
+        args: build
+    - name: Publish Filter
+      uses: actions/bin/filter@master
+      with:
+        args: branch master
+    - name: Docker Login
+      uses: actions/docker/login@master
+      env:
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+    - name: Publish
+      uses: actions/action-builder/docker@master
+      with:
+        entrypoint: make
+        args: publish

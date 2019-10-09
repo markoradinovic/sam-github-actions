@@ -1,16 +1,17 @@
-include ../docker.mk
-include ../shell.mk
-
 IMAGE_NAME=sam-github-actions
-
-.PHONY: lint
-lint: shell-lint docker-lint ## Lint all of the files for this Action.
+BATS_TESTS=$(wildcard *.bats */*.bats)
 
 .PHONY: build
-build: docker-build ## Build this Action.
+build: docker build -t $(IMAGE_NAME) .
+
+.PHONY: docker-tag
+docker-tag:
+	tag $(IMAGE_NAME) $(DOCKER_REPO)/$(IMAGE_NAME) --no-latest
+
+.PHONY: docker-publish
+docker-publish: docker-tag ## Publish the image and tags to a repository.
+	docker push $(DOCKER_REPO)/$(IMAGE_NAME)
 
 .PHONY: test
-test: shell-test ## Test the components of this Action.
-
-.PHONY: publish
-publish: docker-publish ## Publish this Action.
+test:
+	bats $(BATS_TESTS)
