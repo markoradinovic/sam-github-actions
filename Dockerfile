@@ -10,6 +10,8 @@ LABEL "homepage"="https://github.com/chriscoffee"
 LABEL "maintainer"="Chris Mills <millscj01@gmail.com>"
 LABEL "version"="0.0.1"
 
+ENV SAM_CLI_TELEMETRY=0
+
 RUN apk --no-cache --virtual add \
 		gcc \
 		musl-dev \
